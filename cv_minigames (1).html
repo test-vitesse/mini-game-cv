@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CV Arena — Mini-Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f1f3d;
+    --navy2: #1a3260;
+    --gold: #e8b84b;
+    --gold2: #f5d07a;
+    --red: #d63031;
+    --green: #00b894;
+    --white: #f8f6f0;
+    --muted: #8899aa;
+    --card: #162544;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(232,184,75,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,184,75,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  header {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 3rem 1rem 1.5rem;
+  }
+
+  .badge {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--navy);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 0.35rem 1.2rem;
+    border-radius: 100px;
+    margin-bottom: 1.2rem;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.8rem, 7vw, 5rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+
+  h1 span { color: var(--gold); }
+
+  .subtitle {
+    margin-top: 0.8rem;
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 300;
+  }
+
+  .score-bar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1rem;
+    margin: 1.5rem auto;
+    max-width: 500px;
+    background: var(--card);
+    border: 1px solid rgba(232,184,75,0.2);
+    border-radius: 16px;
+  }
+
+  .score-item { text-align: center; }
+  .score-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .score-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  .game-selector {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    justify-content: center;
+    padding: 0 1rem 1.5rem;
+  }
+
+  .game-btn {
+    background: var(--card);
+    border: 2px solid rgba(232,184,75,0.2);
+    color: var(--white);
+    padding: 0.6rem 1.2rem;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .game-btn:hover, .game-btn.active {
+    border-color: var(--gold);
+    background: rgba(232,184,75,0.12);
+    color: var(--gold);
+  }
+
+  .game-area {
+    position: relative;
+    z-index: 1;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 1rem 4rem;
+  }
+
+  .game-panel { display: none; animation: fadeUp 0.4s ease; }
+  .game-panel.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .game-card {
+    background: var(--card);
+    border: 1px solid rgba(232,184,75,0.15);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .game-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .game-desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .flash-sentence {
+    background: rgba(232,184,75,0.08);
+    border-left: 4px solid var(--gold);
+    padding: 1.2rem 1.5rem;
+    border-radius: 0 12px 12px 0;
+    font-size: 1.15rem;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+    min-height: 4rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .btn-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+  .btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.85rem 1.5rem;
+    border-radius: 12px;
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-good    { background: var(--green); color: white; }
+  .btn-bad     { background: var(--red);   color: white; }
+  .btn-gold    { background: var(--gold);  color: var(--navy); }
+  .btn-outline {
+    background: transparent;
+    border: 2px solid rgba(232,184,75,0.3);
+    color: var(--white);
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+
+  .feedback {
+    margin-top: 1rem;
+    padding: 0.9rem 1.2rem;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: none;
+    animation: pop 0.3s ease;
+  }
+  @keyframes pop { from { transform: scale(0.95); } to { transform: scale(1); } }
+  .feedback.good { background: rgba(0,184,148,0.15); border: 1px solid var(--green); color: var(--green); }
+  .feedback.bad  { background: rgba(214,48,49,0.15);  border: 1px solid var(--red);   color: #ff7675; }
+
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.8rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .progress-bar-wrap {
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--gold2));
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+
+  /* Find the Mistakes */
+  .cv-fake {
+    background: white;
+    color: #1a1a1a;
+    border-radius: 12px;
+    padding: 1.5rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cv-fake h3 { font-size: 1.2rem; margin-bottom: 0.3rem; }
+  .cv-fake .cv-section {
+    margin-top: 0.8rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #555;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.2rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .error-word {
+    background: rgba(214,48,49,0.15);
+    border-bottom: 2px solid var(--red);
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 0 2px;
+    transition: background 0.2s;
+  }
+  .error-word:hover { background: rgba(214,48,49,0.3); }
+  .error-word.found { background: rgba(0,184,148,0.2); border-bottom-color: var(--green); }
+
+  .errors-counter {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+  .error-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.2);
+    transition: all 0.3s;
+  }
+  .error-dot.found { background: var(--green); border-color: var(--green); }
+
+  /* Speed Round */
+  .timer-display {
+    font-family: 'Syne', sans-serif;
+    font-size: 4rem;
+    font-weight: 800;
+    text-align: center;
+    color: var(--gold);
+    line-height: 1;
+    margin: 0.5rem 0 1rem;
+  }
+  .timer-display.urgent { color: var(--red); animation: pulse 0.5s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+  .words-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    min-height: 80px;
+    margin: 1rem 0;
+  }
+
+  .word-tag {
+    background: rgba(232,184,75,0.12);
+    border: 1px solid rgba(232,184,75,0.3);
+    color: var(--gold2);
+    padding: 0.4rem 0.9rem;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    animation: tagPop 0.2s ease;
+  }
+  @keyframes tagPop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+  .speed-input {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(232,184,75,0.3);
+    border-radius: 12px;
+    padding: 0.9rem 1.2rem;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .speed-input:focus { border-color: var(--gold); }
+
+  /* Strong or Weak */
+  .versus-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .versus-card {
+    background: rgba(255,255,255,0.04);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 1.2rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    min-height: 110px;
+    display: flex;
+    align-items: center;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+  .versus-card:hover { border-color: var(--gold); background: rgba(232,184,75,0.06); transform: translateY(-3px); }
+  .versus-card.correct { border-color: var(--green); background: rgba(0,184,148,0.1); }
+  .versus-card.wrong   { border-color: var(--red);   background: rgba(214,48,49,0.1); }
+  .versus-label {
+    position: absolute;
+    top: 0.6rem; right: 0.8rem;
+    font-size: 0.7rem;
+    font-family: 'Syne', sans-serif;
+    letter-spacing: 1px;
+    opacity: 0.5;
+  }
+
+  /* Who Am I */
+  .mystery-clue {
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--gold2);
+    background: rgba(232,184,75,0.07);
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1.2rem;
+    font-style: italic;
+  }
+
+  .answers-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.7rem;
+  }
+
+  .answer-btn {
+    background: var(--navy2);
+    border: 2px solid rgba(232,184,75,0.2);
+    color: var(--white);
+    padding: 0.85rem 1rem;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .answer-btn:hover { border-color: var(--gold); background: rgba(232,184,75,0.1); }
+  .answer-btn.correct { border-color: var(--green); background: rgba(0,184,148,0.15); color: var(--green); }
+  .answer-btn.wrong   { border-color: var(--red);   background: rgba(214,48,49,0.1);  color: #ff7675; }
+
+  /* Results */
+  .results-panel { text-align: center; padding: 2rem; display: none; }
+  .results-panel.show { display: block; animation: fadeUp 0.5s ease; }
+  .results-big {
+    font-family: 'Syne', sans-serif;
+    font-size: 5rem;
+    font-weight: 800;
+    color: var(--gold);
+  }
+  .results-msg { font-size: 1.1rem; color: var(--muted); margin: 0.5rem 0 1.5rem; }
+
+  .next-indicator {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: none;
+    cursor: pointer;
+  }
+  .next-indicator.show { display: block; animation: fadeUp 0.3s ease; }
+
+  .divider { height: 1px; background: rgba(255,255,255,0.07); margin: 1.5rem 0; }
+
+  .chip {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 0.2rem;
+  }
+  .chip-easy   { background: rgba(0,184,148,0.15);  color: var(--green); }
+  .chip-medium { background: rgba(232,184,75,0.15);  color: var(--gold); }
+  .chip-hard   { background: rgba(214,48,49,0.15);   color: #ff7675; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="badge">🎮 CV Writing Workshop</div>
+  <h1>CV <span>Arena</span></h1>
+  <p class="subtitle">5 interactive mini-games to master CV writing</p>
+</header>
+
+<!-- SCOREBOARD -->
+<div class="score-bar">
+  <div class="score-item">
+    <div class="score-num" id="totalScore">0</div>
+    <div class="score-label">Points</div>
+  </div>
+  <div class="score-item">
+    <div class="score-num" id="totalCorrect">0</div>
+    <div class="score-label">Correct</div>
+  </div>
+  <div class="score-item">
+    <div class="score-num" id="gamesPlayed">0</div>
+    <div class="score-label">Games Played</div>
+  </div>
+</div>
+
+<!-- GAME TABS -->
+<div class="game-selector">
+  <button class="game-btn active" onclick="switchGame('flash',this)">⚡ Good or Bad?</button>
+  <button class="game-btn" onclick="switchGame('errors',this)">🕵️ Find the Mistakes</button>
+  <button class="game-btn" onclick="switchGame('speed',this)">⏱️ Speed Round</button>
+  <button class="game-btn" onclick="switchGame('versus',this)">🔀 Strong or Weak?</button>
+  <button class="game-btn" onclick="switchGame('mystery',this)">🧩 Who Am I?</button>
+</div>
+
+<div class="game-area">
+
+<!-- ════ GAME 1: GOOD OR BAD ════ -->
+<div class="game-panel active" id="panel-flash">
+  <div class="game-card">
+    <div class="game-title">⚡ Good or Bad?</div>
+    <div class="game-desc">
+      Read the CV line shown. Would you use it in a professional CV?
+      Click <strong>Good!</strong> or <strong>Bad!</strong> to answer.
+      <span class="chip chip-easy">Easy</span>
+    </div>
+    <div class="progress-row">
+      <span id="flash-counter">Question 1 / 10</span>
+      <span id="flash-score-display">Score: 0</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="flash-progress" style="width:10%"></div>
+    </div>
+    <div class="flash-sentence" id="flash-sentence">Loading…</div>
+    <div class="btn-row">
+      <button class="btn btn-good" onclick="answerFlash(true)">✅ Good!</button>
+      <button class="btn btn-bad"  onclick="answerFlash(false)">❌ Bad!</button>
+    </div>
+    <div class="feedback" id="flash-feedback"></div>
+    <div class="next-indicator" id="flash-next">→ Click to continue</div>
+  </div>
+  <div class="results-panel" id="flash-results">
+    <div class="results-big" id="flash-final-score"></div>
+    <div class="results-msg" id="flash-final-msg"></div>
+    <button class="btn btn-gold" onclick="resetFlash()">🔄 Play Again</button>
+  </div>
+</div>
+
+<!-- ════ GAME 2: FIND THE MISTAKES ════ -->
+<div class="game-panel" id="panel-errors">
+  <div class="game-card">
+    <div class="game-title">🕵️ Find the 5 Mistakes</div>
+    <div class="game-desc">
+      This CV contains exactly <strong>5 mistakes</strong>. Click on each suspicious element to flag it.
+      <span class="chip chip-medium">Medium</span>
+    </div>
+    <div class="errors-counter" id="errors-dots">
+      <span style="color:var(--muted);font-size:0.8rem;margin-right:0.3rem;">Found:</span>
+    </div>
+    <div class="cv-fake">
+      <h3>James Mitchell</h3>
+      <div style="color:#777;font-size:0.82rem;margin-bottom:0.5rem;">
+        📍 London &nbsp;|&nbsp;
+        📞 <span class="error-word" data-id="0" title="Unprofessional — just list the number without a label like 'my personal number'">My personal number: 07XX XXX XXXX</span>
+        &nbsp;|&nbsp;
+        ✉️ <span class="error-word" data-id="1" title="Unprofessional email — use firstname.lastname@domain">jimmy_gamer99@hotmail.com</span>
+      </div>
+      <div class="cv-section">Education</div>
+      <p>BSc Computer Science — University of Manchester<br>
+      <span style="color:#888;font-size:0.82rem;">2021 – 2024</span></p>
+      <div class="cv-section">Experience</div>
+      <p><strong>Intern — TechSolutions Ltd</strong><br>
+      <span style="color:#888;font-size:0.82rem;">July 2023 — 2 months</span><br>
+      <span class="error-word" data-id="2" title="Too vague — no action verb, no result, no specifics">• I did various computer stuff and helped the team with things.</span><br>
+      • Developed an automated reporting module in Python, reducing processing time by 30%.</p>
+      <div class="cv-section">Skills</div>
+      <p>Python, SQL, HTML/CSS,
+      <span class="error-word" data-id="3" title="Exaggerated and unverifiable — never claim to be an expert at everything">"Expert at everything"</span>,
+      Teamwork</p>
+      <div class="cv-section">Hobbies &amp; Interests</div>
+      <p><span class="error-word" data-id="4" title="Irrelevant hobbies — only include if they add professional value">Playing video games, watching Netflix, eating pizza</span></p>
+    </div>
+    <div class="divider"></div>
+    <div class="feedback" id="errors-feedback"></div>
+    <button class="btn btn-outline" id="errors-hint-btn" onclick="showErrorHint()" style="margin-top:0.5rem">💡 Hint</button>
+    <div class="results-panel" id="errors-results">
+      <div class="results-big">🎉</div>
+      <div class="results-msg">All mistakes found! +50 bonus points</div>
+      <button class="btn btn-gold" onclick="resetErrors()">🔄 Try Again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ GAME 3: SPEED ROUND ════ -->
+<div class="game-panel" id="panel-speed">
+  <div class="game-card">
+    <div class="game-title">⏱️ Speed Round</div>
+    <div class="game-desc">
+      You have <strong>45 seconds</strong> to type as many CV action verbs as possible.
+      Press Enter after each word (e.g. Developed, Managed, Designed…).
+      <span class="chip chip-hard">Hard</span>
+    </div>
+    <div class="timer-display" id="speed-timer">45</div>
+    <input class="speed-input" id="speed-input"
+      placeholder="Type an action verb and press Enter…"
+      disabled onkeydown="speedKeydown(event)"
+      autocomplete="off" spellcheck="false">
+    <div class="words-grid" id="speed-words"></div>
+    <div class="btn-row" style="margin-top:0.5rem">
+      <button class="btn btn-gold" id="speed-start-btn" onclick="startSpeed()">▶ Start</button>
+    </div>
+    <div class="results-panel" id="speed-results">
+      <div class="results-big" id="speed-final-count"></div>
+      <div class="results-msg" id="speed-final-msg"></div>
+      <div id="speed-valid-list" style="margin-bottom:1.2rem;font-size:0.85rem;color:var(--muted);"></div>
+      <button class="btn btn-gold" onclick="resetSpeed()">🔄 Play Again</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ GAME 4: STRONG OR WEAK ════ -->
+<div class="game-panel" id="panel-versus">
+  <div class="game-card">
+    <div class="game-title">🔀 Strong or Weak?</div>
+    <div class="game-desc">
+      Click on the <strong>better</strong> of the two CV phrases — the one that sounds more professional and impactful.
+      <span class="chip chip-easy">Easy</span>
+    </div>
+    <div class="progress-row">
+      <span id="versus-counter">Round 1 / 8</span>
+      <span id="versus-score-display">Score: 0</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="versus-progress" style="width:12.5%"></div>
+    </div>
+    <div class="versus-grid" id="versus-options"></div>
+    <div class="feedback" id="versus-feedback"></div>
+    <div class="next-indicator" id="versus-next">→ Click to continue</div>
+  </div>
+  <div class="results-panel" id="versus-results">
+    <div class="results-big" id="versus-final-score"></div>
+    <div class="results-msg" id="versus-final-msg"></div>
+    <button class="btn btn-gold" onclick="resetVersus()">🔄 Play Again</button>
+  </div>
+</div>
+
+<!-- ════ GAME 5: WHO AM I ════ -->
+<div class="game-panel" id="panel-mystery">
+  <div class="game-card">
+    <div class="game-title">🧩 Who Am I?</div>
+    <div class="game-desc">
+      Read the CV excerpt and guess which <strong>CV section</strong> it belongs to.
+      <span class="chip chip-medium">Medium</span>
+    </div>
+    <div class="progress-row">
+      <span id="mystery-counter">Clue 1 / 7</span>
+      <span id="mystery-score-display">Score: 0</span>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="mystery-progress" style="width:14.3%"></div>
+    </div>
+    <div class="mystery-clue" id="mystery-clue">Loading…</div>
+    <div class="answers-grid" id="mystery-answers"></div>
+    <div class="feedback" id="mystery-feedback"></div>
+    <div class="next-indicator" id="mystery-next">→ Click to continue</div>
+  </div>
+  <div class="results-panel" id="mystery-results">
+    <div class="results-big" id="mystery-final-score"></div>
+    <div class="results-msg" id="mystery-final-msg"></div>
+    <button class="btn btn-gold" onclick="resetMystery()">🔄 Play Again</button>
+  </div>
+</div>
+
+</div><!-- /game-area -->
+
+<script>
+// ══════════════════════════════════════════════
+// GLOBAL
+// ══════════════════════════════════════════════
+let totalScore = 0, totalCorrect = 0, gamesPlayed = 0;
+
+function addScore(pts, isCorrect) {
+  totalScore += pts;
+  if (isCorrect) totalCorrect++;
+  document.getElementById('totalScore').textContent = totalScore;
+  document.getElementById('totalCorrect').textContent = totalCorrect;
+}
+function bumpGames() {
+  gamesPlayed++;
+  document.getElementById('gamesPlayed').textContent = gamesPlayed;
+}
+function switchGame(id, btn) {
+  document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.game-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════════
+// GAME 1 — GOOD OR BAD
+// ══════════════════════════════════════════════
+const flashData = [
+  { text: '"I am very motivated and I like working in a team."',
+    good: false, why: 'Too vague and clichéd — no concrete evidence.' },
+  { text: '"Developed a web-based inventory system using Python and Django."',
+    good: true,  why: 'Specific action + technology + clear deliverable. ✅' },
+  { text: '"Responsible for various office tasks."',
+    good: false, why: 'No specifics — what tasks? What was the result?' },
+  { text: '"Designed and deployed an e-commerce site that reduced cart abandonment by 25%."',
+    good: true,  why: 'Action verb + quantified result = highly impactful. ✅' },
+  { text: '"Good communication skills and a nice personality."',
+    good: false, why: 'Unproven claims — show don\'t tell.' },
+  { text: '"Managed a team of 4 students during a 3-month university project."',
+    good: true,  why: 'Role + team size + duration = strong and credible. ✅' },
+  { text: '"Know how to use Microsoft Word and Excel (a little bit)."',
+    good: false, why: '"A little bit" shows low confidence and lacks professionalism.' },
+  { text: '"IELTS Certified — Band 7.5 (English)."',
+    good: true,  why: 'Official certification, clearly stated. ✅' },
+  { text: '"I did an internship at a company and I learned a lot of things."',
+    good: false, why: 'No specifics — what company? What did you build or achieve?' },
+  { text: '"Analysed weekly sales data using SQL to identify underperforming products."',
+    good: true,  why: 'Concrete task + tool used + business purpose. ✅' },
+];
+
+let flashIdx = 0, flashScore = 0, flashAnswered = false;
+
+function renderFlash() {
+  const q = flashData[flashIdx];
+  document.getElementById('flash-sentence').textContent = q.text;
+  document.getElementById('flash-counter').textContent = `Question ${flashIdx+1} / ${flashData.length}`;
+  document.getElementById('flash-score-display').textContent = `Score: ${flashScore}`;
+  document.getElementById('flash-progress').style.width = `${((flashIdx+1)/flashData.length)*100}%`;
+  document.getElementById('flash-feedback').style.display = 'none';
+  document.getElementById('flash-next').classList.remove('show');
+  flashAnswered = false;
+}
+
+function answerFlash(userSaysGood) {
+  if (flashAnswered) { nextFlash(); return; }
+  flashAnswered = true;
+  const q = flashData[flashIdx];
+  const correct = (userSaysGood === q.good);
+  const fb = document.getElementById('flash-feedback');
+  if (correct) {
+    flashScore += 10; addScore(10, true);
+    fb.className = 'feedback good';
+    fb.textContent = '✅ Correct! ' + q.why;
+  } else {
+    addScore(0, false);
+    fb.className = 'feedback bad';
+    fb.textContent = '❌ Wrong! ' + q.why;
+  }
+  fb.style.display = 'block';
+  document.getElementById('flash-next').classList.add('show');
+}
+
+function nextFlash() {
+  flashIdx++;
+  if (flashIdx >= flashData.length) {
+    bumpGames();
+    document.querySelector('#panel-flash .game-card').style.display = 'none';
+    document.getElementById('flash-results').classList.add('show');
+    const pct = Math.round((flashScore / (flashData.length * 10)) * 100);
+    document.getElementById('flash-final-score').textContent = flashScore + 'pts';
+    document.getElementById('flash-final-msg').textContent =
+      pct >= 80 ? '🏆 Excellent! You have a strong eye for CV quality!' :
+      pct >= 50 ? '👍 Not bad — keep practising the key principles!' :
+                  '📚 Review the slides on writing techniques and try again!';
+    return;
+  }
+  renderFlash();
+}
+
+function resetFlash() {
+  flashIdx = 0; flashScore = 0;
+  document.querySelector('#panel-flash .game-card').style.display = 'block';
+  document.getElementById('flash-results').classList.remove('show');
+  renderFlash();
+}
+
+renderFlash();
+
+// ══════════════════════════════════════════════
+// GAME 2 — FIND THE MISTAKES
+// ══════════════════════════════════════════════
+let errorsFound = 0;
+const TOTAL_ERRORS = 5;
+
+function buildDots() {
+  const c = document.getElementById('errors-dots');
+  const lbl = c.querySelector('span');
+  c.innerHTML = ''; c.appendChild(lbl);
+  for (let i = 0; i < TOTAL_ERRORS; i++) {
+    const d = document.createElement('div');
+    d.className = 'error-dot'; d.id = 'edot-' + i;
+    c.appendChild(d);
+  }
+}
+
+document.querySelectorAll('.error-word').forEach(el => {
+  el.addEventListener('click', function () {
+    if (this.classList.contains('found')) return;
+    this.classList.add('found');
+    errorsFound++;
+    const dot = document.getElementById('edot-' + (errorsFound - 1));
+    if (dot) dot.classList.add('found');
+    const fb = document.getElementById('errors-feedback');
+    fb.className = 'feedback good';
+    fb.textContent = '✅ Mistake #' + errorsFound + ': ' + this.title;
+    fb.style.display = 'block';
+    addScore(10, true);
+    if (errorsFound === TOTAL_ERRORS) {
+      bumpGames(); addScore(50, false);
+      setTimeout(() => document.getElementById('errors-results').classList.add('show'), 800);
+    }
+  });
+});
+
+function showErrorHint() {
+  const fb = document.getElementById('errors-feedback');
+  fb.className = 'feedback bad';
+  fb.textContent = '💡 Hint: Look for an unprofessional email, a poorly labelled phone number, a vague job description, an exaggerated skill claim, and irrelevant hobbies.';
+  fb.style.display = 'block';
+  document.getElementById('errors-hint-btn').disabled = true;
+}
+
+function resetErrors() {
+  errorsFound = 0;
+  document.querySelectorAll('.error-word').forEach(el => el.classList.remove('found'));
+  document.getElementById('errors-feedback').style.display = 'none';
+  document.getElementById('errors-results').classList.remove('show');
+  document.getElementById('errors-hint-btn').disabled = false;
+  buildDots();
+}
+
+buildDots();
+
+// ══════════════════════════════════════════════
+// GAME 3 — SPEED ROUND
+// ══════════════════════════════════════════════
+const validVerbs = new Set([
+  'developed','managed','designed','created','led','built','implemented',
+  'analysed','analyzed','presented','coordinated','organised','organized',
+  'supervised','produced','planned','delivered','improved','resolved',
+  'identified','proposed','documented','tested','integrated','deployed',
+  'negotiated','mentored','monitored','evaluated','maintained','piloted',
+  'automated','configured','administered','drafted','translated','applied',
+  'established','launched','restructured','transformed','defined','adapted',
+  'collaborated','contributed','streamlined','optimised','optimized',
+  'spearheaded','executed','facilitated','researched','trained','audited',
+  'reported','reviewed','communicated','assisted','supported','operated',
+  'enhanced','oversaw','modelled','modeled','handled','directed','achieved',
+  'increased','reduced','generated','saved','secured','coordinated'
+]);
+
+let speedInterval, speedSeconds = 45, speedRunning = false, speedWords = [];
+
+function startSpeed() {
+  document.getElementById('speed-start-btn').style.display = 'none';
+  document.getElementById('speed-input').disabled = false;
+  document.getElementById('speed-input').focus();
+  document.getElementById('speed-results').classList.remove('show');
+  speedWords = [];
+  document.getElementById('speed-words').innerHTML = '';
+  speedSeconds = 45; speedRunning = true;
+  speedInterval = setInterval(() => {
+    speedSeconds--;
+    const el = document.getElementById('speed-timer');
+    el.textContent = speedSeconds;
+    el.className = 'timer-display' + (speedSeconds <= 10 ? ' urgent' : '');
+    if (speedSeconds <= 0) endSpeed();
+  }, 1000);
+}
+
+function speedKeydown(e) {
+  if (e.key !== 'Enter') return;
+  const raw = e.target.value.trim().toLowerCase();
+  e.target.value = '';
+  if (!speedRunning || !raw || speedWords.includes(raw)) return;
+  const valid = validVerbs.has(raw) || (/ed$/.test(raw) && raw.length > 5);
+  if (valid) {
+    speedWords.push(raw);
+    const tag = document.createElement('div');
+    tag.className = 'word-tag';
+    tag.textContent = raw.charAt(0).toUpperCase() + raw.slice(1);
+    document.getElementById('speed-words').appendChild(tag);
+    addScore(5, true);
+  }
+}
+
+function endSpeed() {
+  clearInterval(speedInterval); speedRunning = false;
+  document.getElementById('speed-input').disabled = true;
+  document.getElementById('speed-timer').textContent = '0';
+  bumpGames();
+  const n = speedWords.length;
+  document.getElementById('speed-results').classList.add('show');
+  document.getElementById('speed-final-count').textContent = n + ' verbs';
+  document.getElementById('speed-final-msg').textContent =
+    n >= 15 ? '🏆 Impressive! You have an excellent vocabulary bank!' :
+    n >= 8  ? '👍 Good effort — keep building your action verb list!' :
+              '📚 Practise memorising more action verbs for your CV!';
+  document.getElementById('speed-valid-list').textContent = speedWords.length
+    ? 'Your verbs: ' + speedWords.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(', ')
+    : '';
+}
+
+function resetSpeed() {
+  clearInterval(speedInterval);
+  speedRunning = false; speedSeconds = 45; speedWords = [];
+  document.getElementById('speed-timer').textContent = '45';
+  document.getElementById('speed-timer').className = 'timer-display';
+  document.getElementById('speed-words').innerHTML = '';
+  document.getElementById('speed-input').disabled = true;
+  document.getElementById('speed-start-btn').style.display = '';
+  document.getElementById('speed-results').classList.remove('show');
+}
+
+// ══════════════════════════════════════════════
+// GAME 4 — STRONG OR WEAK
+// ══════════════════════════════════════════════
+const versusData = [
+  { a: '"Responsible for various tasks."',
+    b: '"Coordinated 3 simultaneous projects, all delivered on time."',
+    correct: 'b', why: 'Option B is concrete and shows a real outcome.' },
+  { a: '"Developed a CRM module that reduced support tickets by 40%."',
+    b: '"Worked on some customer software."',
+    correct: 'a', why: 'Option A quantifies the impact — far more powerful.' },
+  { a: '"Very good oral and written communication skills."',
+    b: '"Presented 5 technical reports to a team of 10 engineers."',
+    correct: 'b', why: 'Option B proves the skill with a real example.' },
+  { a: '"Some knowledge of Python."',
+    b: '"Proficient in Python — applied across 3 university projects."',
+    correct: 'b', why: 'Precision and proof of use make option B stronger.' },
+  { a: '"Internship at a company, performed various duties."',
+    b: '"2-month internship at TechCorp — built 2 REST APIs in Node.js."',
+    correct: 'b', why: 'Duration + company + specific task = professional.' },
+  { a: '"Managed a SQL database with over 50,000 records."',
+    b: '"I worked with databases before."',
+    correct: 'a', why: 'Numbers and named technology add real credibility.' },
+  { a: '"Proficient in Excel: pivot tables, VLOOKUP, data visualisation."',
+    b: '"Can use Excel a bit."',
+    correct: 'a', why: 'Specific features demonstrate a real level of expertise.' },
+  { a: '"Supervised 4 junior interns during their technical onboarding."',
+    b: '"Helped some people at work."',
+    correct: 'a', why: 'Clear role, headcount, and context — much stronger.' },
+];
+
+let versusIdx = 0, versusScore = 0, versusAnswered = false;
+
+function renderVersus() {
+  const q = versusData[versusIdx];
+  document.getElementById('versus-options').innerHTML = '';
+  document.getElementById('versus-counter').textContent = `Round ${versusIdx+1} / ${versusData.length}`;
+  document.getElementById('versus-score-display').textContent = `Score: ${versusScore}`;
+  document.getElementById('versus-progress').style.width = `${((versusIdx+1)/versusData.length)*100}%`;
+  document.getElementById('versus-feedback').style.display = 'none';
+  document.getElementById('versus-next').classList.remove('show');
+  versusAnswered = false;
+  ['a','b'].forEach(opt => {
+    const card = document.createElement('div');
+    card.className = 'versus-card';
+    card.innerHTML = `<span class="versus-label">${opt.toUpperCase()}</span>${q[opt]}`;
+    card.onclick = () => answerVersus(opt);
+    document.getElementById('versus-options').appendChild(card);
+  });
+}
+
+function answerVersus(opt) {
+  if (versusAnswered) { nextVersus(); return; }
+  versusAnswered = true;
+  const q = versusData[versusIdx];
+  const correct = opt === q.correct;
+  document.getElementById('versus-options').querySelectorAll('.versus-card').forEach((c, i) => {
+    if (['a','b'][i] === q.correct) c.classList.add('correct');
+    else if (['a','b'][i] === opt) c.classList.add('wrong');
+  });
+  const fb = document.getElementById('versus-feedback');
+  if (correct) { versusScore += 10; addScore(10, true); fb.className = 'feedback good'; }
+  else { addScore(0, false); fb.className = 'feedback bad'; }
+  fb.textContent = (correct ? '✅ ' : '❌ ') + q.why;
+  fb.style.display = 'block';
+  document.getElementById('versus-next').classList.add('show');
+}
+
+function nextVersus() {
+  versusIdx++;
+  if (versusIdx >= versusData.length) {
+    bumpGames();
+    document.querySelector('#panel-versus .game-card').style.display = 'none';
+    document.getElementById('versus-results').classList.add('show');
+    const pct = Math.round((versusScore / (versusData.length * 10)) * 100);
+    document.getElementById('versus-final-score').textContent = versusScore + 'pts';
+    document.getElementById('versus-final-msg').textContent =
+      pct >= 80 ? '🏆 Excellent CV instincts — you know what works!' :
+      pct >= 50 ? '👍 Good — review what makes a phrase strong vs weak!' :
+                  '📚 Re-read the slides on action verbs and quantification!';
+    return;
+  }
+  renderVersus();
+}
+
+function resetVersus() {
+  versusIdx = 0; versusScore = 0;
+  document.querySelector('#panel-versus .game-card').style.display = 'block';
+  document.getElementById('versus-results').classList.remove('show');
+  renderVersus();
+}
+
+renderVersus();
+
+// ══════════════════════════════════════════════
+// GAME 5 — WHO AM I
+// ══════════════════════════════════════════════
+const mysteryData = [
+  { clue: '"BSc Industrial Engineering — University of Manchester. Graduated 2024. First Class Honours."',
+    answer: 'Education', options: ['Education','Experience','Skills','Personal Info'] },
+  { clue: '"6-week internship at Google UK — IT Department. Developed automation scripts using Python."',
+    answer: 'Experience', options: ['Education','Experience','Languages','Projects'] },
+  { clue: '"English: Native | French: B2 | Spanish: A2"',
+    answer: 'Languages', options: ['Skills','Languages','Education','Hobbies'] },
+  { clue: '"Python, Java, SQL, React, Linux, Git — used in academic and personal projects."',
+    answer: 'Skills', options: ['Experience','Skills','Projects','Education'] },
+  { clue: '"Name: Sarah Johnson | Email: s.johnson@gmail.com | Phone: +44 XXXX XXXXXX"',
+    answer: 'Personal Info', options: ['Experience','Personal Info','Education','Languages'] },
+  { clue: '"University grade tracker mobile app — built over 2 months using Flutter and Firebase."',
+    answer: 'Projects', options: ['Projects','Experience','Skills','Education'] },
+  { clue: '"Teamwork, Communication, Time Management, Problem Solving, Adaptability."',
+    answer: 'Soft Skills', options: ['Soft Skills','Languages','Projects','Skills'] },
+];
+
+let mysteryIdx = 0, mysteryScore = 0, mysteryAnswered = false;
+
+function renderMystery() {
+  const q = mysteryData[mysteryIdx];
+  document.getElementById('mystery-clue').textContent = q.clue;
+  document.getElementById('mystery-counter').textContent = `Clue ${mysteryIdx+1} / ${mysteryData.length}`;
+  document.getElementById('mystery-score-display').textContent = `Score: ${mysteryScore}`;
+  document.getElementById('mystery-progress').style.width = `${((mysteryIdx+1)/mysteryData.length)*100}%`;
+  document.getElementById('mystery-feedback').style.display = 'none';
+  document.getElementById('mystery-next').classList.remove('show');
+  mysteryAnswered = false;
+  const grid = document.getElementById('mystery-answers');
+  grid.innerHTML = '';
+  [...q.options].sort(() => Math.random() - 0.5).forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn'; btn.textContent = opt;
+    btn.onclick = () => answerMystery(opt, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function answerMystery(opt, btn) {
+  if (mysteryAnswered) { nextMystery(); return; }
+  mysteryAnswered = true;
+  const q = mysteryData[mysteryIdx];
+  const correct = opt === q.answer;
+  document.getElementById('mystery-answers').querySelectorAll('.answer-btn').forEach(b => {
+    if (b.textContent === q.answer) b.classList.add('correct');
+    else if (b === btn && !correct) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('mystery-feedback');
+  if (correct) {
+    mysteryScore += 10; addScore(10, true);
+    fb.className = 'feedback good';
+    fb.textContent = `✅ Correct! That belongs to the "${q.answer}" section.`;
+  } else {
+    addScore(0, false);
+    fb.className = 'feedback bad';
+    fb.textContent = `❌ Wrong — that was the "${q.answer}" section.`;
+  }
+  fb.style.display = 'block';
+  document.getElementById('mystery-next').classList.add('show');
+}
+
+function nextMystery() {
+  mysteryIdx++;
+  if (mysteryIdx >= mysteryData.length) {
+    bumpGames();
+    document.querySelector('#panel-mystery .game-card').style.display = 'block';
+    document.getElementById('mystery-results').classList.add('show');
+    const pct = Math.round((mysteryScore / (mysteryData.length * 10)) * 100);
+    document.getElementById('mystery-final-score').textContent = mysteryScore + 'pts';
+    document.getElementById('mystery-final-msg').textContent =
+      pct >= 80 ? '🏆 Perfect — you know the CV structure inside out!' :
+      pct >= 50 ? '👍 Good base — review the names of each section!' :
+                  '📚 Go back to the CV structure slides and try again!';
+    return;
+  }
+  renderMystery();
+}
+
+function resetMystery() {
+  mysteryIdx = 0; mysteryScore = 0;
+  document.querySelector('#panel-mystery .game-card').style.display = 'block';
+  document.getElementById('mystery-results').classList.remove('show');
+  renderMystery();
+}
+
+renderMystery();
+
+// "→ Click to continue" handlers
+document.querySelectorAll('.next-indicator').forEach(el => {
+  el.addEventListener('click', () => {
+    const id = el.closest('.game-panel').id.replace('panel-', '');
+    if (id === 'flash')   nextFlash();
+    if (id === 'versus')  nextVersus();
+    if (id === 'mystery') nextMystery();
+  });
+});
+</script>
+</body>
+</html>
